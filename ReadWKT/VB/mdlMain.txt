@@ -1,0 +1,115 @@
+﻿Sub EksportZakresy()
+
+    Dim rowsCounter As Long
+
+    Dim fileOperatWkt As String
+    Dim fileOperatWktId As Integer
+
+    Dim fileOperatUpdate As String
+    Dim fileOperatUpdateId As Integer
+
+    Dim fileSkanWkt As String
+    Dim fileSkanWktId As Integer
+
+    Dim wkt As String
+    Dim wktSplit() As String
+
+    Dim idOp As String
+
+    Dim s
+    Dim szuk As Integer
+
+    fileOperatWkt = ActiveWorkbook.Path & "\01_wkt_operaty.sql"
+    fileOperatWktId = FreeFile
+
+    Open fileOperatWkt For Output As fileOperatWktId
+
+    fileOperatUpdate = ActiveWorkbook.Path & "\02_operaty_update.sql"
+    fileOperatUpdateId = FreeFile
+
+    Open fileOperatUpdate For Output As fileOperatUpdateId
+
+    fileSkanWkt = ActiveWorkbook.Path & "\03_wkt_skany.sql"
+    fileSkanWktId = FreeFile
+
+    Open fileSkanWkt For Output As fileSkanWktId
+
+        rowsCounter = 2
+
+    While Cells(rowsCounter, "A") <> ""
+
+        idOp = Cells(rowsCounter, "F")
+
+        wkt = Replace(Replace(Trim(GetWkt(Cells(rowsCounter, "A") & "\" & Cells(rowsCounter, "B"))), Chr(10), ""), Chr(13), "")
+
+        If Len(wkt) > 4000 Then
+
+            wktSplit = SplitString(wkt, 4000)
+
+            wkt = ""
+
+            For Each s In wktSplit
+                wkt = wkt & " ||" & vbNewLine & "to_clob('" & s & "')"
+            Next
+
+            szuk = InStr(wkt, "to_clob")
+
+            wkt = Mid(wkt, szuk)
+
+        Else
+
+            wkt = "to_clob('" & wkt & "')"
+
+        End If
+
+        If Cells(rowsCounter, "E") = True Then
+
+            Print #fileOperatWktId, "UPDATE osr_operat SET geom = MDSYS.SDO_GEOMETRY(" & wkt & ", 2177) WHERE idop = " & idOp & ";"
+
+                Print #fileOperatUpdateId, "UPDATE kdok_wsk SET geom = (SELECT geom FROM osr_operat WHERE idop = " & idOp & ") WHERE wl = 'operat' AND id_gr = " & idOp & " AND data_k IS NULL;"
+
+            Else
+
+            Print #fileSkanWktId, "UPDATE kdok_wsk SET geom = MDSYS.SDO_GEOMETRY(" & wkt & ", 2177) WHERE id_gr = " & idOp & " AND UPPER(path) LIKE '%\" & Replace(UCase(Cells(rowsCounter, "B")), ".WKT", ".PDF") & "' AND data_k IS NULL;"
+
+            End If
+
+        rowsCounter = rowsCounter + 1
+    
+        Wend
+    
+    Close fileSkanWktId
+
+    Close fileOperatUpdateId
+
+    Close fileOperatWktId
+
+End Sub
+
+Function GetWkt(ByVal fileName As String) As String
+
+    With CreateObject("Scripting.FileSystemObject")
+
+        GetWkt = .OpenTextFile(fileName, 1).readall
+
+    End With
+
+End Function
+
+Public Function SplitString(ByVal str As String, ByVal numOfChar As Long) As String()
+    Dim sArr() As String
+    Dim nCount As Long
+
+    ReDim sArr(Len(str) \ numOfChar)
+
+    Do While Len(str)
+        sArr(nCount) = Left$(str, numOfChar)
+        str = Mid$(str, numOfChar + 1)
+        nCount = nCount + 1
+    Loop
+
+    SplitString = sArr
+
+End Function
+
+

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadWKT", "ReadWKT\ReadWKT.csproj", "{0F7E40A9-7A2D-4BFF-8CA3-0888B86D66F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WKT_Tools", "WKT_Tools\WKT_Tools.csproj", "{0A26798C-376B-436A-9BD7-28D95F33823E}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "License", "..\License Generator\License\License.shproj", "{0E661AE5-DDF3-4F0A-8022-CF43A6E9D9C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPPlus", "..\EPPlus\EPPlus\EPPlus.csproj", "{BE4A6343-F411-44A3-8D6F-F40747ED7BA5}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\License Generator\License\License.projitems*{0e661ae5-ddf3-4f0a-8022-cf43a6e9d9c8}*SharedItemsImports = 13
+		..\License Generator\License\License.projitems*{0f7e40a9-7a2d-4bff-8ca3-0888b86d66f8}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F7E40A9-7A2D-4BFF-8CA3-0888B86D66F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F7E40A9-7A2D-4BFF-8CA3-0888B86D66F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F7E40A9-7A2D-4BFF-8CA3-0888B86D66F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F7E40A9-7A2D-4BFF-8CA3-0888B86D66F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A26798C-376B-436A-9BD7-28D95F33823E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A26798C-376B-436A-9BD7-28D95F33823E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A26798C-376B-436A-9BD7-28D95F33823E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A26798C-376B-436A-9BD7-28D95F33823E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE4A6343-F411-44A3-8D6F-F40747ED7BA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE4A6343-F411-44A3-8D6F-F40747ED7BA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE4A6343-F411-44A3-8D6F-F40747ED7BA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE4A6343-F411-44A3-8D6F-F40747ED7BA5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0BF62E77-3C1D-4CB4-B52E-8117007352D1}
+	EndGlobalSection
+EndGlobal
