@@ -14,7 +14,9 @@ namespace WKT_Tools
         public string WktText { get; }
         public int WktSize { get; }
         public string GeometryType { get; }
-        public string IsValid { get; }
+        public string ValidationStatus { get; }
+
+        private readonly SqlBoolean _isValid;
 
         public WktFile(string fileName)
         {
@@ -32,24 +34,18 @@ namespace WKT_Tools
             {
                 SqlGeometry geom = SqlGeometry.STGeomFromText(new SqlChars(WktText), 0);
 
-                IsValid = geom.IsValidDetailed();
+                ValidationStatus = geom.IsValidDetailed();
 
-                if (geom.STIsValid())
-                {
-                    GeometryType = geom.STGeometryType().ToString();
-                }
-                else
-                {
-                    GeometryType = "Unknown";
-                    Console.WriteLine(IsValid);
-                }
+                _isValid = geom.STIsValid();
+
+                GeometryType = _isValid ? geom.STGeometryType().ToString() : "Unknown";
             }
             catch (Exception e)
             {
-                IsValid = e.Message;
-                GeometryType = "Unknown";
+                ValidationStatus = e.Message;
+                _isValid = false;
 
-                Console.WriteLine(e.Message);
+                GeometryType = "Unknown";
             }
 
             if (WktText.Length > 32767)
@@ -57,6 +53,11 @@ namespace WKT_Tools
                 WktText = WktText.Substring(0, 32767);
             }
             
+        }
+
+        public SqlBoolean IsValid()
+        {
+            return _isValid;
         }
     }
 }

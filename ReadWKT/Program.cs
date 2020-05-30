@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CommandLine;
 using License;
 using OfficeOpenXml;
 using ReadWKT.Tools;
 using ReadWKT.VB;
 using WKT_Tools;
+using System.Threading;
 
 namespace ReadWKT
 {
@@ -40,7 +42,7 @@ namespace ReadWKT
 
                 case LicenseStatus.Valid:
                     
-                    Console.WriteLine("Właściciel licencji:");
+                    Console.WriteLine("Właściciel licencji:\n");
                     Console.WriteLine(license.LicenseOwner + "\n");
 
                     Console.ForegroundColor = ConsoleColor.Blue; 
@@ -48,7 +50,7 @@ namespace ReadWKT
                     
                     Console.ForegroundColor = defaultColor;
 
-                    System.Threading.Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                     break;
 
                 case LicenseStatus.Invalid:
@@ -89,9 +91,24 @@ namespace ReadWKT
             SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
             
             // --------------------------------------------------------------------------------------------
-
             // folder startowy dla danych analizowanych przez aplikację
-            string startupPath = args[0].TrimEnd('\\');
+
+            string startupPath = string.Empty;
+
+            void RunOptions(Options opts)
+            {
+                startupPath = opts.StarupPath;
+            }
+
+            void HandleParseError(IEnumerable<Error> errs)
+            {
+                Console.ReadKey(false);
+                Environment.Exit(0);
+            }
+
+            Parser.Default.ParseArguments<Options>(args).WithParsed(RunOptions).WithNotParsed(HandleParseError);
+
+            // --------------------------------------------------------------------------------------------
 
             Console.WriteLine("Pobieranie listy folerów...");
 
@@ -117,11 +134,20 @@ namespace ReadWKT
                 if (subdirs.Length == 0) wktDirectories.Add(dir);   // jeśli dany katalog nie ma podfolderów dodaj go do listy katalogów z wkt
             }
 
-            Console.WriteLine($"Koniec analizy folderów. Pozostało {wktDirectories.Count} folderów.\n");
+            Console.WriteLine("Zliczanie plików...");
+            FileInfo[] files = new DirectoryInfo(startupPath).GetFiles("*.wkt", SearchOption.AllDirectories);
 
-            WktFeatures wktFeatures = new WktFeatures();
+            Console.WriteLine($"Koniec analizy folderów. Pozostało {wktDirectories.Count} folderów. Plików WKT: {files.Length}\n");
 
             int filesCounter = 1;
+
+            Timer timer = new Timer(TimerCallback, null, 0, 1000);
+
+            void TimerCallback(Object o) {
+                Console.WriteLine($"ID: {filesCounter, 6} / {files.Length}");
+            }
+
+            WktFeatures wktFeatures = new WktFeatures();
 
             foreach (string wktDirectory in wktDirectories)
             {
@@ -130,9 +156,17 @@ namespace ReadWKT
                 foreach (string wktFileName in wktFileNames)
                 {
                     WktFile wktFile = new WktFile(wktFileName);
+
+                    if (!wktFile.IsValid())
+                    {
+                        Console.WriteLine($"ID: {filesCounter, 6} => {Path.GetFileName(wktFileName), 40}: {wktFile.ValidationStatus}");
+                    }
+                    
                     wktFeatures.Add(filesCounter++, wktFile);
                 }
             }
+
+            timer.Dispose();
 
             string outputFile = Path.Combine(startupPath, "wkt.xlsm");
 
